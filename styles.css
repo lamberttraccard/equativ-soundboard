@@ -319,6 +319,12 @@ h1 {
     --person-glow: 0 8px 32px rgba(155, 89, 182, 0.3);
 }
 
+.person-card[data-person="momo"] {
+    --person-color: #E91E63;
+    --person-color-light: #F06292;
+    --person-glow: 0 8px 32px rgba(233, 30, 99, 0.3);
+}
+
 /* === Person Header === */
 .person-header {
     display: flex;

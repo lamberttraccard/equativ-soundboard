@@ -57,30 +57,38 @@ const soundsByPerson = {
         sounds: [
             { name: "Sound 1", file: "sounds/adrien-1.m4a", key: "A" },
             { name: "Sound 2", file: "sounds/adrien-2.mp3", key: "B" },
-            { name: "Sound 3", file: "sounds/adrien-3.m4a", key: "C" }
+            { name: "Sound 3", file: "sounds/adrien-3.m4a", key: "C" },
+            { name: "Sound 4", file: "sounds/adrien-4.m4a", key: "D" }
         ]
     },
     alex: {
         name: "Alex",
         avatar: "star",
         sounds: [
-            { name: "Sound 1", file: "sounds/alex-1.m4a", key: "D" },
-            { name: "Sound 2", file: "sounds/alex-2.m4a", key: "E" }
+            { name: "Sound 1", file: "sounds/alex-1.m4a", key: "E" },
+            { name: "Sound 2", file: "sounds/alex-2.m4a", key: "F" }
         ]
     },
     lambert: {
         name: "Lambert",
         avatar: "music",
         sounds: [
-            { name: "Sound 1", file: "sounds/lambert-1.m4a", key: "F" },
-            { name: "Sound 2", file: "sounds/lambert-2.m4a", key: "G" }
+            { name: "Sound 1", file: "sounds/lambert-1.m4a", key: "G" },
+            { name: "Sound 2", file: "sounds/lambert-2.m4a", key: "H" }
         ]
     },
     delgado: {
         name: "Delgado",
         avatar: "bolt",
         sounds: [
-            { name: "Sound 1", file: "sounds/delgado-1.m4a", key: "H" }
+            { name: "Sound 1", file: "sounds/delgado-1.m4a", key: "I" }
+        ]
+    },
+    momo: {
+        name: "Momo",
+        avatar: "heart",
+        sounds: [
+            { name: "Sound 1", file: "sounds/momo-1.m4a", key: "J" }
         ]
     }
 };
@@ -120,6 +128,9 @@ const avatars = {
     </svg>`,
     bolt: `<svg viewBox="0 0 24 24" fill="currentColor">
         <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+    </svg>`,
+    heart: `<svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
     </svg>`
 };
 
@@ -128,7 +139,8 @@ const personColors = {
     adrien: '#0077CC',
     alex: '#FF6600',
     lambert: '#00B8A9',
-    delgado: '#9B59B6'
+    delgado: '#9B59B6',
+    momo: '#E91E63'
 };
 
 // === State ===
