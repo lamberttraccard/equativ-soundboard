@@ -313,6 +313,12 @@ h1 {
     --person-glow: var(--shadow-glow-teal);
 }
 
+.person-card[data-person="delgado"] {
+    --person-color: #9B59B6;
+    --person-color-light: #BB7DD4;
+    --person-glow: 0 8px 32px rgba(155, 89, 182, 0.3);
+}
+
 /* === Person Header === */
 .person-header {
     display: flex;

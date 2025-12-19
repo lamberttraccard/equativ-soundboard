@@ -56,23 +56,31 @@ const soundsByPerson = {
         avatar: "rocket",
         sounds: [
             { name: "Sound 1", file: "sounds/adrien-1.m4a", key: "A" },
-            { name: "Sound 2", file: "sounds/adrien-2.mp3", key: "B" }
+            { name: "Sound 2", file: "sounds/adrien-2.mp3", key: "B" },
+            { name: "Sound 3", file: "sounds/adrien-3.m4a", key: "C" }
         ]
     },
     alex: {
         name: "Alex",
         avatar: "star",
         sounds: [
-            { name: "Sound 1", file: "sounds/alex-1.m4a", key: "C" },
-            { name: "Sound 2", file: "sounds/alex-2.m4a", key: "D" }
+            { name: "Sound 1", file: "sounds/alex-1.m4a", key: "D" },
+            { name: "Sound 2", file: "sounds/alex-2.m4a", key: "E" }
         ]
     },
     lambert: {
         name: "Lambert",
         avatar: "music",
         sounds: [
-            { name: "Sound 1", file: "sounds/lambert-1.m4a", key: "E" },
-            { name: "Sound 2", file: "sounds/lambert-2.m4a", key: "F" }
+            { name: "Sound 1", file: "sounds/lambert-1.m4a", key: "F" },
+            { name: "Sound 2", file: "sounds/lambert-2.m4a", key: "G" }
+        ]
+    },
+    delgado: {
+        name: "Delgado",
+        avatar: "bolt",
+        sounds: [
+            { name: "Sound 1", file: "sounds/delgado-1.m4a", key: "H" }
         ]
     }
 };
@@ -109,6 +117,9 @@ const avatars = {
         <path d="M9 18V5l12-2v13"/>
         <circle cx="6" cy="18" r="3"/>
         <circle cx="18" cy="16" r="3"/>
+    </svg>`,
+    bolt: `<svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
     </svg>`
 };
 
@@ -116,7 +127,8 @@ const avatars = {
 const personColors = {
     adrien: '#0077CC',
     alex: '#FF6600',
-    lambert: '#00B8A9'
+    lambert: '#00B8A9',
+    delgado: '#9B59B6'
 };
 
 // === State ===
