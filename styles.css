@@ -331,6 +331,18 @@ h1 {
     --person-glow: 0 8px 32px rgba(243, 156, 18, 0.3);
 }
 
+.person-card[data-person="jbex"] {
+    --person-color: #E74C3C;
+    --person-color-light: #F1948A;
+    --person-glow: 0 8px 32px rgba(231, 76, 60, 0.3);
+}
+
+.person-card[data-person="ronan"] {
+    --person-color: #1ABC9C;
+    --person-color-light: #76D7C4;
+    --person-glow: 0 8px 32px rgba(26, 188, 156, 0.3);
+}
+
 /* === Person Header === */
 .person-header {
     display: flex;
