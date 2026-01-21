@@ -56,9 +56,12 @@ const soundsByPerson = {
         avatar: "rocket",
         sounds: [
             { name: "Sound 1", file: "sounds/adrien-1.m4a", key: "A" },
-            { name: "Sound 2", file: "sounds/adrien-2.mp3", key: "B" },
+            { name: "Sound 2", file: "sounds/adrien-2.m4a", key: "B" },
             { name: "Sound 3", file: "sounds/adrien-3.m4a", key: "C" },
-            { name: "Sound 4", file: "sounds/adrien-4.m4a", key: "D" }
+            { name: "Sound 4", file: "sounds/adrien-4.m4a", key: "D" },
+            { name: "Sound 5", file: "sounds/adrien-5.m4a", key: "M" },
+            { name: "Sound 6", file: "sounds/adrien-6.m4a", key: "N" },
+            { name: "Sound 7", file: "sounds/adrien-7.m4a", key: "O" }
         ]
     },
     alex: {
@@ -74,7 +77,9 @@ const soundsByPerson = {
         avatar: "music",
         sounds: [
             { name: "Sound 1", file: "sounds/lambert-1.m4a", key: "G" },
-            { name: "Sound 2", file: "sounds/lambert-2.m4a", key: "H" }
+            { name: "Sound 2", file: "sounds/lambert-2.m4a", key: "H" },
+            { name: "Sound 3", file: "sounds/lambert-3.m4a", key: "P" },
+            { name: "Sound 4", file: "sounds/lambert-4.m4a", key: "Q" }
         ]
     },
     delgado: {
@@ -97,6 +102,27 @@ const soundsByPerson = {
         avatar: "sun",
         sounds: [
             { name: "Sound 1", file: "sounds/hadrien-1.m4a", key: "L" }
+        ]
+    },
+    jbex: {
+        name: "Jbex",
+        avatar: "flame",
+        sounds: [
+            { name: "Sound 1", file: "sounds/jeremy-1.m4a", key: "R" },
+            { name: "Sound 2", file: "sounds/jeremy-2.m4a", key: "S" },
+            { name: "Sound 3", file: "sounds/jeremy-3.m4a", key: "T" },
+            { name: "Sound 4", file: "sounds/jeremy-4.m4a", key: "U" }
+        ]
+    },
+    ronan: {
+        name: "Ronan",
+        avatar: "globe",
+        sounds: [
+            { name: "Sound 1", file: "sounds/ronan-1.m4a", key: "V" },
+            { name: "Sound 2", file: "sounds/ronan-2.m4a", key: "W" },
+            { name: "Sound 3", file: "sounds/ronan-4.m4a", key: "X" },
+            { name: "Sound 4", file: "sounds/ronan-6.m4a", key: "Y" },
+            { name: "Sound 5", file: "sounds/ronan-8.m4a", key: "Z" }
         ]
     }
 };
@@ -150,6 +176,14 @@ const avatars = {
         <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>`,
+    flame: `<svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8zm0 18c-3.35 0-6-2.57-6-6.2 0-2.34 1.95-5.44 6-9.14 4.05 3.7 6 6.79 6 9.14 0 3.63-2.65 6.2-6 6.2zm-1-8c-1.5 1.28-2 3-2 4a3 3 0 0 0 6 0c0-1-.5-2.72-2-4l-1-1-1 1z"/>
+    </svg>`,
+    globe: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="2" y1="12" x2="22" y2="12"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
     </svg>`
 };
 
@@ -160,7 +194,9 @@ const personColors = {
     lambert: '#00B8A9',
     delgado: '#9B59B6',
     momo: '#E91E63',
-    hadrien: '#F39C12'
+    hadrien: '#F39C12',
+    jbex: '#E74C3C',
+    ronan: '#1ABC9C'
 };
 
 // === State ===
