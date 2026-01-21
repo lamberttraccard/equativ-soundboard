@@ -891,3 +891,424 @@ kbd:focus-visible {
     outline: 3px solid var(--brand-blue);
     outline-offset: 2px;
 }
+
+/* === Macro Bar === */
+.macro-bar {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow-md);
+    transition: background 0.3s ease;
+}
+
+.macro-bar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.macro-bar-title {
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-primary);
+}
+
+.macro-bar-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.macro-slots {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 12px;
+}
+
+.macro-slot {
+    position: relative;
+    background: var(--btn-bg);
+    border: 2px solid var(--text-muted);
+    border-radius: 12px;
+    padding: 12px 8px;
+    cursor: pointer;
+    transition: all 0.3s var(--spring-timing);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-height: 80px;
+}
+
+.macro-slot:hover {
+    border-color: var(--brand-blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow-blue);
+}
+
+.macro-slot.has-macro {
+    border-color: var(--brand-teal);
+}
+
+.macro-slot.has-macro:hover {
+    border-color: var(--teal-light);
+    box-shadow: var(--shadow-glow-teal);
+}
+
+.macro-slot.playing {
+    border-color: var(--brand-orange);
+    box-shadow: var(--shadow-glow-orange);
+    animation: macro-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes macro-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.macro-slot-number {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.macro-slot-name {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.macro-slot-keys {
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.macro-slot-edit {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.macro-slot-edit svg {
+    width: 12px;
+    height: 12px;
+    color: var(--text-secondary);
+}
+
+.macro-slot.has-macro:hover .macro-slot-edit {
+    opacity: 1;
+}
+
+.macro-slot-edit:hover {
+    transform: scale(1.1);
+    background: var(--brand-blue);
+}
+
+.macro-slot-edit:hover svg {
+    color: white;
+}
+
+/* === Macro Modal === */
+.macro-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.macro-modal.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.macro-modal-content {
+    background: var(--bg-card);
+    border-radius: 24px;
+    padding: 32px;
+    width: 90%;
+    max-width: 440px;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s var(--spring-timing);
+}
+
+.macro-modal.open .macro-modal-content {
+    transform: translateY(0) scale(1);
+}
+
+.macro-modal-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.macro-slot-picker {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.slot-btn {
+    aspect-ratio: 1;
+    border: 2px solid var(--text-muted);
+    border-radius: 10px;
+    background: var(--btn-bg);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.slot-btn:hover {
+    border-color: var(--brand-blue);
+    background: rgba(0, 119, 204, 0.1);
+}
+
+.slot-btn.active {
+    border-color: var(--brand-blue);
+    background: var(--brand-blue);
+    color: white;
+}
+
+.macro-form-group {
+    margin-bottom: 20px;
+}
+
+.macro-form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.macro-form-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--text-muted);
+    border-radius: 12px;
+    background: var(--btn-bg);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    transition: border-color 0.2s ease;
+}
+
+.macro-form-group input:focus {
+    outline: none;
+    border-color: var(--brand-blue);
+}
+
+.macro-form-group input::placeholder {
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.macro-key-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 40px;
+    margin-bottom: 24px;
+}
+
+.key-preview-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.key-preview-item.valid {
+    background: linear-gradient(135deg, var(--brand-teal), var(--teal-light));
+    color: white;
+}
+
+.key-preview-item.invalid {
+    background: linear-gradient(135deg, #E74C3C, #F1948A);
+    color: white;
+}
+
+.macro-form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.macro-form-actions-right {
+    display: flex;
+    gap: 12px;
+}
+
+.macro-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.macro-btn-save {
+    background: linear-gradient(135deg, var(--brand-blue), var(--blue-light));
+    color: white;
+}
+
+.macro-btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow-blue);
+}
+
+.macro-btn-cancel {
+    background: var(--btn-bg);
+    border: 2px solid var(--text-muted);
+    color: var(--text-secondary);
+}
+
+.macro-btn-cancel:hover {
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+}
+
+.macro-btn-delete {
+    background: linear-gradient(135deg, #E74C3C, #F1948A);
+    color: white;
+    display: none;
+}
+
+.macro-btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(231, 76, 60, 0.3);
+}
+
+/* === Macro Responsive === */
+@media (max-width: 768px) {
+    .macro-slots {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .macro-slot {
+        padding: 10px 6px;
+        min-height: 70px;
+    }
+
+    .macro-slot-number {
+        font-size: 1.1rem;
+    }
+
+    .macro-slot-name {
+        font-size: 0.55rem;
+    }
+
+    .macro-slot-picker {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .macro-bar {
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .macro-bar-header {
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-start;
+    }
+
+    .macro-slots {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .macro-slot {
+        padding: 8px 4px;
+        min-height: 60px;
+        border-radius: 10px;
+    }
+
+    .macro-slot-number {
+        font-size: 1rem;
+    }
+
+    .macro-modal-content {
+        padding: 24px;
+        margin: 20px;
+    }
+
+    .macro-slot-picker {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .macro-form-actions {
+        flex-direction: column;
+    }
+
+    .macro-form-actions-right {
+        width: 100%;
+    }
+
+    .macro-btn {
+        flex: 1;
+    }
+
+    .macro-btn-delete {
+        width: 100%;
+    }
+}

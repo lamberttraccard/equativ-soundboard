@@ -50,6 +50,370 @@ const ThemeManager = {
     }
 };
 
+// === Macro System ===
+const MacroSystem = {
+    STORAGE_KEY: 'soundboard-macros',
+    macros: [],
+    isPlaying: false,
+    shouldStop: false,
+    currentSlot: null,
+
+    load() {
+        try {
+            const data = localStorage.getItem(this.STORAGE_KEY);
+            this.macros = data ? JSON.parse(data) : [];
+        } catch {
+            this.macros = [];
+        }
+    },
+
+    save() {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.macros));
+    },
+
+    get(slot) {
+        return this.macros.find(m => m.slot === slot);
+    },
+
+    set(slot, name, keys) {
+        const existing = this.macros.findIndex(m => m.slot === slot);
+        const macro = { slot, name: name || `Macro ${slot}`, keys: keys.toUpperCase() };
+        if (existing >= 0) {
+            this.macros[existing] = macro;
+        } else {
+            this.macros.push(macro);
+        }
+        this.save();
+        this.renderSlots();
+    },
+
+    delete(slot) {
+        this.macros = this.macros.filter(m => m.slot !== slot);
+        this.save();
+        this.renderSlots();
+    },
+
+    async play(slot) {
+        if (this.isPlaying) return;
+
+        const macro = this.get(slot);
+        if (!macro) {
+            this.openModal(slot);
+            return;
+        }
+
+        this.isPlaying = true;
+        this.shouldStop = false;
+        this.currentSlot = slot;
+        this.updateSlotState(slot, true);
+
+        for (const key of macro.keys) {
+            if (this.shouldStop) break;
+
+            const soundIndex = sounds.findIndex(s => s.key.toUpperCase() === key);
+            if (soundIndex === -1) continue;
+
+            await this.playSoundAsync(soundIndex);
+        }
+
+        this.isPlaying = false;
+        this.currentSlot = null;
+        this.updateSlotState(slot, false);
+    },
+
+    playSoundAsync(index) {
+        return new Promise((resolve) => {
+            const sound = sounds[index];
+            if (!sound) {
+                resolve();
+                return;
+            }
+
+            stopAllSounds();
+
+            let audio = audioElements.get(index);
+            if (!audio) {
+                audio = new Audio();
+                if (isServedOverHttp) {
+                    audio.crossOrigin = 'anonymous';
+                }
+                audio.src = sound.file + audioCacheBuster;
+                audioElements.set(index, audio);
+            }
+
+            if (isServedOverHttp) {
+                visualizer.connectAudio(audio);
+            }
+
+            audio.currentTime = 0;
+            audio.play().catch(() => resolve());
+
+            currentlyPlaying = { index, audio };
+            lastPlayedSound = index;
+
+            const personId = sound.personId;
+            const color = personColors[personId] || '#0077CC';
+
+            if (isServedOverHttp) {
+                visualizer.draw(color);
+            }
+
+            const button = soundboard.querySelector(`[data-index="${index}"]`);
+            if (button) {
+                const rect = button.getBoundingClientRect();
+                particles.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, color);
+            }
+
+            updatePlayingState(index, true);
+            showNowPlaying(sound.name);
+            startProgressAnimation();
+
+            const onEnded = () => {
+                if (isServedOverHttp) {
+                    visualizer.stop();
+                }
+                updatePlayingState(index, false);
+                hideNowPlaying();
+                stopProgressAnimation();
+                currentlyPlaying = null;
+                audio.removeEventListener('ended', onEnded);
+                resolve();
+            };
+
+            audio.addEventListener('ended', onEnded);
+
+            // Also resolve if macro is stopped
+            const checkStop = setInterval(() => {
+                if (this.shouldStop) {
+                    clearInterval(checkStop);
+                    resolve();
+                }
+            }, 50);
+
+            audio.addEventListener('ended', () => clearInterval(checkStop), { once: true });
+        });
+    },
+
+    stop() {
+        this.shouldStop = true;
+        if (this.currentSlot) {
+            this.updateSlotState(this.currentSlot, false);
+        }
+    },
+
+    updateSlotState(slot, playing) {
+        const slotEl = document.querySelector(`.macro-slot[data-slot="${slot}"]`);
+        if (slotEl) {
+            slotEl.classList.toggle('playing', playing);
+        }
+    },
+
+    initUI() {
+        this.createMacroBar();
+        this.createModal();
+        this.renderSlots();
+    },
+
+    createMacroBar() {
+        const bar = document.createElement('div');
+        bar.className = 'macro-bar';
+        bar.innerHTML = `
+            <div class="macro-bar-header">
+                <span class="macro-bar-title">Macros</span>
+                <span class="macro-bar-hint">Click or press 1-9</span>
+            </div>
+            <div class="macro-slots">
+                ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(slot => `
+                    <button class="macro-slot" data-slot="${slot}">
+                        <span class="macro-slot-number">${slot}</span>
+                        <span class="macro-slot-name">Empty</span>
+                        <span class="macro-slot-keys"></span>
+                        <span class="macro-slot-edit" title="Edit macro">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </span>
+                    </button>
+                `).join('')}
+            </div>
+        `;
+
+        const soundboardEl = document.getElementById('soundboard');
+        soundboardEl.parentNode.insertBefore(bar, soundboardEl);
+
+        bar.querySelectorAll('.macro-slot').forEach(slot => {
+            slot.addEventListener('click', (e) => {
+                // Ignore if clicking on edit button
+                if (e.target.closest('.macro-slot-edit')) return;
+
+                const slotNum = parseInt(slot.dataset.slot);
+                if (this.isPlaying) return;
+
+                const macro = this.get(slotNum);
+                if (macro) {
+                    // Play the macro
+                    this.play(slotNum);
+                } else {
+                    // Open modal to create
+                    this.openModal(slotNum);
+                }
+            });
+
+            // Edit button click
+            const editBtn = slot.querySelector('.macro-slot-edit');
+            if (editBtn) {
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const slotNum = parseInt(slot.dataset.slot);
+                    if (this.isPlaying) return;
+                    this.openModal(slotNum);
+                });
+            }
+        });
+    },
+
+    createModal() {
+        const modal = document.createElement('div');
+        modal.className = 'macro-modal';
+        modal.id = 'macro-modal';
+        modal.innerHTML = `
+            <div class="macro-modal-content">
+                <h2 class="macro-modal-title">Edit Macro</h2>
+                <form id="macro-form">
+                    <div class="macro-slot-picker">
+                        ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(slot => `
+                            <button type="button" class="slot-btn" data-slot="${slot}">${slot}</button>
+                        `).join('')}
+                    </div>
+                    <div class="macro-form-group">
+                        <label for="macro-name">Name (optional)</label>
+                        <input type="text" id="macro-name" placeholder="Macro name...">
+                    </div>
+                    <div class="macro-form-group">
+                        <label for="macro-keys">Key sequence</label>
+                        <input type="text" id="macro-keys" placeholder="e.g. ABC" required>
+                    </div>
+                    <div class="macro-key-preview" id="macro-key-preview"></div>
+                    <div class="macro-form-actions">
+                        <button type="button" class="macro-btn macro-btn-delete" id="macro-delete">Delete</button>
+                        <div class="macro-form-actions-right">
+                            <button type="button" class="macro-btn macro-btn-cancel" id="macro-cancel">Cancel</button>
+                            <button type="submit" class="macro-btn macro-btn-save">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Event listeners
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) this.closeModal();
+        });
+
+        document.getElementById('macro-cancel').addEventListener('click', () => this.closeModal());
+        document.getElementById('macro-delete').addEventListener('click', () => {
+            const slot = this.modalSlot;
+            if (slot) {
+                this.delete(slot);
+                this.closeModal();
+            }
+        });
+
+        document.getElementById('macro-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const slot = this.modalSlot;
+            const name = document.getElementById('macro-name').value.trim();
+            const keys = document.getElementById('macro-keys').value.trim().toUpperCase();
+
+            if (!keys) return;
+
+            // Validate keys
+            const invalidKeys = [...keys].filter(k => !sounds.some(s => s.key.toUpperCase() === k));
+            if (invalidKeys.length > 0) {
+                alert(`Invalid keys: ${invalidKeys.join(', ')}`);
+                return;
+            }
+
+            this.set(slot, name, keys);
+            this.closeModal();
+        });
+
+        // Slot picker
+        modal.querySelectorAll('.slot-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.selectSlot(parseInt(btn.dataset.slot));
+            });
+        });
+
+        // Key preview
+        document.getElementById('macro-keys').addEventListener('input', (e) => {
+            this.updateKeyPreview(e.target.value);
+        });
+    },
+
+    selectSlot(slot) {
+        this.modalSlot = slot;
+        document.querySelectorAll('.slot-btn').forEach(btn => {
+            btn.classList.toggle('active', parseInt(btn.dataset.slot) === slot);
+        });
+
+        const macro = this.get(slot);
+        document.getElementById('macro-name').value = macro?.name || '';
+        document.getElementById('macro-keys').value = macro?.keys || '';
+        document.getElementById('macro-delete').style.display = macro ? 'block' : 'none';
+        this.updateKeyPreview(macro?.keys || '');
+    },
+
+    updateKeyPreview(keys) {
+        const preview = document.getElementById('macro-key-preview');
+        if (!keys) {
+            preview.innerHTML = '';
+            return;
+        }
+
+        preview.innerHTML = [...keys.toUpperCase()].map(key => {
+            const valid = sounds.some(s => s.key.toUpperCase() === key);
+            return `<span class="key-preview-item ${valid ? 'valid' : 'invalid'}">${key}</span>`;
+        }).join('');
+    },
+
+    openModal(slot) {
+        const modal = document.getElementById('macro-modal');
+        modal.classList.add('open');
+        this.selectSlot(slot);
+        document.getElementById('macro-keys').focus();
+    },
+
+    closeModal() {
+        const modal = document.getElementById('macro-modal');
+        modal.classList.remove('open');
+        this.modalSlot = null;
+    },
+
+    renderSlots() {
+        for (let slot = 1; slot <= 9; slot++) {
+            const slotEl = document.querySelector(`.macro-slot[data-slot="${slot}"]`);
+            if (!slotEl) continue;
+
+            const macro = this.get(slot);
+            const nameEl = slotEl.querySelector('.macro-slot-name');
+            const keysEl = slotEl.querySelector('.macro-slot-keys');
+
+            if (macro) {
+                slotEl.classList.add('has-macro');
+                nameEl.textContent = macro.name;
+                keysEl.textContent = macro.keys;
+            } else {
+                slotEl.classList.remove('has-macro');
+                nameEl.textContent = 'Empty';
+                keysEl.textContent = '';
+            }
+        }
+    }
+};
+
 const soundsByPerson = {
     adrien: {
         name: "Adrien",
@@ -380,6 +744,8 @@ const particles = new ParticleSystem(particleContainer);
 // === Initialize ===
 function init() {
     ThemeManager.init();
+    MacroSystem.load();
+    MacroSystem.initUI();
     renderSoundboard();
     setupKeyboardListeners();
     animateCardsIn();
@@ -615,16 +981,29 @@ function hideNowPlaying() {
 // === Keyboard Listeners ===
 function setupKeyboardListeners() {
     document.addEventListener('keydown', (event) => {
-        // Ignore if typing in an input
+        // Escape - Close modal or stop sounds (always handle, even in inputs)
+        if (event.key === 'Escape') {
+            const modal = document.getElementById('macro-modal');
+            if (modal && modal.classList.contains('open')) {
+                MacroSystem.closeModal();
+                return;
+            }
+            MacroSystem.stop();
+            stopAllSounds();
+            return;
+        }
+
+        // Ignore other keys if typing in an input
         if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
             return;
         }
 
         const key = event.key.toUpperCase();
 
-        // Escape - Stop all sounds
-        if (event.key === 'Escape') {
-            stopAllSounds();
+        // Number keys 1-9 - Play macro
+        if (/^[1-9]$/.test(event.key)) {
+            event.preventDefault();
+            MacroSystem.play(parseInt(event.key));
             return;
         }
 
